@@ -1,0 +1,85 @@
+{
+  "name": "HR Portal \u2014 Dashboard Data (Leave Balance & History)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "hr-dashboard",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "8ca2b853-8942-417b-9f33-2da898377a92",
+      "name": "Dashboard Request",
+      "webhookId": "44b9571b43134e63"
+    },
+    {
+      "parameters": {
+        "jsCode": "\n// Simulated HR leave data. Looked up by email (query param), case-insensitive.\nconst email = ($json.query && $json.query.email ? String($json.query.email) : '').toLowerCase().trim();\nconst db = {\n  'staff@tertiaryinfotech.com': { name: 'Alex Tan',  entitlement: 18, annualTaken: 6, medicalTaken: 2 },\n  'angch@tertiaryinfotech.com': { name: 'Ang Chew Hoe', entitlement: 18, annualTaken: 3, medicalTaken: 0 },\n};\nconst def = { name: 'Staff Member', entitlement: 14, annualTaken: 4, medicalTaken: 1 };\nconst r = db[email] || def;\nconst annualBalance = r.entitlement - r.annualTaken;\nconst medicalEntitlement = 14;\nreturn [{ json: {\n  name: r.name,\n  email: email || 'staff@tertiaryinfotech.com',\n  annual:  { entitlement: r.entitlement, taken: r.annualTaken, balance: annualBalance },\n  medical: { entitlement: medicalEntitlement, taken: r.medicalTaken, balance: medicalEntitlement - r.medicalTaken },\n  recent: [\n    { type: 'Annual',  dates: '2026-05-12 \u2192 2026-05-13', days: 2, status: 'Approved' },\n    { type: 'Medical', dates: '2026-04-02',               days: 1, status: 'Approved' },\n    { type: 'Annual',  dates: '2026-06-30 \u2192 2026-07-01', days: 2, status: 'Pending'  },\n  ],\n} }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ],
+      "id": "ef67cc14-bbd8-490d-9ba1-77561b1dedaa",
+      "name": "Build Dashboard Data"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        480,
+        0
+      ],
+      "id": "a78d6f97-5720-4750-a0b9-ddd63f8e48cd",
+      "name": "Respond Dashboard"
+    }
+  ],
+  "connections": {
+    "Dashboard Request": {
+      "main": [
+        [
+          {
+            "node": "Build Dashboard Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Dashboard Data": {
+      "main": [
+        [
+          {
+            "node": "Respond Dashboard",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false,
+  "pinData": {},
+  "meta": {
+    "templateId": "tertiaryinfotech-n8n-course"
+  },
+  "tags": []
+}
