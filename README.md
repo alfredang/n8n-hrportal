@@ -66,10 +66,12 @@ A single shared **OpenAI Chat Model** node feeds all three LLM steps (input guar
 | File | Description |
 |------|-------------|
 | [`index.html`](index.html) | The full HR portal front-end (dashboard, leave form, chatbot) — no build step. |
-| [`Activity8a-Human-in-the-Loop.json`](Activity8a-Human-in-the-Loop.json) | n8n workflow: **Leave Application & Manager Approval** (human-in-the-loop). |
-| [`HR-Portal-Dashboard.json`](HR-Portal-Dashboard.json) | n8n workflow: **Dashboard Data** (leave balance & history). |
-| [`Activity8b-Guardrails.json`](Activity8b-Guardrails.json) | n8n workflow: **AI Chatbot with Input & Output Guardrails**. |
+| [`HR-Portal-Leave-Approval.json`](HR-Portal-Leave-Approval.json) | n8n workflow: **Leave Application & Manager Approval** (human-in-the-loop). |
+| [`HR-Portal-Dashboard-Data.json`](HR-Portal-Dashboard-Data.json) | n8n workflow: **Dashboard Data** (leave balance & history). |
+| [`HR-Portal-AI-Chatbot-Guardrails.json`](HR-Portal-AI-Chatbot-Guardrails.json) | n8n workflow: **AI Chatbot with Input & Output Guardrails**. |
 | [`.env.example`](.env.example) | Template for the required environment variables. |
+
+> The three flow files are exported from (and match) the live n8n workflows: **HR Portal — Leave Application & Manager Approval**, **HR Portal — Dashboard Data**, and **HR Portal — AI Chatbot with Input & Output Guardrails**.
 
 ---
 
