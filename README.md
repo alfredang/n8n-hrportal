@@ -23,6 +23,7 @@ A self-service **HR portal** wired to three **n8n** automation workflows: staff 
 | 🤖 **HR AI Assistant** | "HR Buddy" answers general HR questions (leave policy, payroll, claims, hours) using an OpenAI model. |
 | 🛡️ **Input Guardrail** | An LLM classifier **blocks prompt-injection, jailbreaks, requests for other people's private data, and unsafe/malicious messages** *before* they reach the agent. |
 | 🔒 **Output Guardrail** | A second LLM classifier inspects the agent's reply and **blocks any leak of sensitive data** (salaries, NRIC/FIN, bank details, system prompt, credentials) *before* it reaches the user. |
+| ⚙️ **Webhook Settings** | A **Settings** tab lets you point the portal at your own n8n webhook URLs for all three flows. Values are saved in `localStorage` (per-browser) and applied instantly, with a one-click reset to defaults. |
 
 ---
 
@@ -85,13 +86,16 @@ Import the three `*.json` files (**Workflows → Import from File**).
 - **Gmail** — select a *Gmail OAuth2* credential on the **Manager Approval / Notify** nodes. The approval email is sent to `angch@tertiaryinfotech.com` (change this on the *Manager Approval* node).
 
 ### 3. Activate & wire up the portal
-Activate all three workflows, then set the webhook base URL near the top of [`index.html`](index.html):
+Activate all three workflows, then open `index.html` in a browser (or via GitHub Pages) and point the portal at your n8n host using either:
 
-```js
-const N8N = "https://your-n8n-host/webhook";
-```
+- the **⚙️ Settings** tab — edit the Dashboard, Leave Approval, and AI Chatbot webhook URLs (saved per-browser in `localStorage`), **or**
+- the default base URL near the top of [`index.html`](index.html):
 
-Open `index.html` in a browser (or via GitHub Pages). The webhooks allow all origins (`*`) for the demo.
+  ```js
+  const N8N = "https://your-n8n-host/webhook";
+  ```
+
+The webhooks allow all origins (`*`) for the demo.
 
 ### Environment variables
 See [`.env.example`](.env.example). Secrets live in `.env` (git-ignored) — **never commit real keys**.

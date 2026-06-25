@@ -99,6 +99,7 @@
     <button class="active" data-tab="dashboard" onclick="showTab(this)">📊 Dashboard</button>
     <button data-tab="leave" onclick="showTab(this)">📝 Apply Leave</button>
     <button data-tab="chat" onclick="showTab(this)">🤖 HR Assistant</button>
+    <button data-tab="settings" onclick="showTab(this)">⚙️ Settings</button>
   </nav>
 
   <!-- DASHBOARD -->
@@ -172,6 +173,32 @@
     </div>
   </section>
 
+  <!-- SETTINGS -->
+  <section id="settings" class="panel">
+    <div class="card">
+      <h2>Webhook Settings</h2>
+      <p class="sub">Point the portal at your own n8n webhook URLs for each of the three flows.
+        Changes are saved in this browser only (localStorage) and take effect immediately.</p>
+      <form id="settingsForm" onsubmit="saveSettings(event)">
+        <div class="field">
+          <label>📊 Dashboard webhook URL</label>
+          <input id="urlDashboard" type="url" placeholder="https://your-n8n/webhook/hr-dashboard" required/>
+        </div>
+        <div class="field">
+          <label>📝 Leave Approval webhook URL</label>
+          <input id="urlLeave" type="url" placeholder="https://your-n8n/webhook/hr-leave-apply" required/>
+        </div>
+        <div class="field">
+          <label>🤖 AI Chatbot webhook URL</label>
+          <input id="urlChat" type="url" placeholder="https://your-n8n/webhook/hr-chat" required/>
+        </div>
+        <button class="btn" type="submit">Save settings</button>
+        <button class="btn" type="button" style="background:#fff;color:var(--ink);border:1px solid var(--line)" onclick="resetSettings()">Reset to defaults</button>
+        <div class="note" id="settingsNote"></div>
+      </form>
+    </div>
+  </section>
+
   <div class="footer">
     © Tertiary Infotech Pte Ltd · HR Service Portal demo · n8n workflows: Leave Approval · Dashboard · Guarded AI Chatbot
     <p class="powered-by">Powered by <a href="https://www.tertiaryinfotech.com/" target="_blank" rel="noopener">Tertiary Infotech Academy Pte Ltd</a></p>
@@ -181,11 +208,48 @@
 <script>
   // ===== Config: n8n production webhooks =====
   const N8N = "https://n8n.tertiarytraining.com/webhook";
-  const EP = {
+  const DEFAULT_EP = {
     dashboard: N8N + "/hr-dashboard",
     leave:     N8N + "/hr-leave-apply",
     chat:      N8N + "/hr-chat",
   };
+  const SETTINGS_KEY = "hrPortalWebhooks";
+  // EP holds the live endpoints; overridden by saved settings if present.
+  let EP = { ...DEFAULT_EP };
+  function loadSettings(){
+    try{
+      const saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) || "{}");
+      EP = {
+        dashboard: saved.dashboard || DEFAULT_EP.dashboard,
+        leave:     saved.leave     || DEFAULT_EP.leave,
+        chat:      saved.chat      || DEFAULT_EP.chat,
+      };
+    }catch(e){ EP = { ...DEFAULT_EP }; }
+    document.getElementById('urlDashboard').value = EP.dashboard;
+    document.getElementById('urlLeave').value     = EP.leave;
+    document.getElementById('urlChat').value      = EP.chat;
+  }
+  function saveSettings(e){
+    e.preventDefault();
+    const note = document.getElementById('settingsNote');
+    EP = {
+      dashboard: val('urlDashboard').trim(),
+      leave:     val('urlLeave').trim(),
+      chat:      val('urlChat').trim(),
+    };
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(EP));
+    note.className = "note ok";
+    note.textContent = "✅ Webhook URLs saved. Reloading dashboard…";
+    loadDashboard();
+  }
+  function resetSettings(){
+    localStorage.removeItem(SETTINGS_KEY);
+    loadSettings();
+    const note = document.getElementById('settingsNote');
+    note.className = "note ok";
+    note.textContent = "↩️ Reset to default webhook URLs.";
+    loadDashboard();
+  }
 
   function showTab(btn){
     document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
@@ -270,6 +334,7 @@
     document.getElementById('startDate').value=iso(start);
     document.getElementById('endDate').value=iso(end);
     document.getElementById('me').addEventListener('change',()=>{document.getElementById('email').value=me();});
+    loadSettings();
     loadDashboard();
   })();
 </script>
